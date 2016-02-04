@@ -27,8 +27,8 @@
             return wsp;
         };
 
-        wsp.$get = ['$http', function ($http) {
-            return new $websocketService(wsp.$$config, $http);
+        wsp.$get = ['$http', '$window', function ($http, $window) {
+            return new $websocketService(wsp.$$config, $http, $window);
         }];
     }
 
@@ -39,7 +39,7 @@
      * @description
      * HTML5 Websocket service for AngularJS
      */
-    function $websocketService (cfg, $http) {
+    function $websocketService (cfg, $http, $window) {
         var wss = this;
 
         wss.$$websocketList = {};
@@ -61,6 +61,11 @@
                     if (typeof arguments[1] === 'string' && arguments[1].length > 0) cfg.protocols = [arguments[1]];
                     else if (typeof arguments[1] === 'object' && arguments[1].length > 0) cfg.protocols = arguments[1];
                 }
+            }
+            
+            // If provided URL is relative try to come up with the absolute one
+            if (!cfg.url.startsWith('ws://') || !cfg.url.startsWith('wss://')) {
+                cfg.url = $window.location.origin.replace('http', 'ws') + $window.location.pathname + cfg.url;
             }
 
             // If the websocket already exists, return that instance
