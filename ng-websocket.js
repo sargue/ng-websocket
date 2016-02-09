@@ -27,8 +27,8 @@
             return wsp;
         };
 
-        wsp.$get = ['$http', '$window', function ($http, $window) {
-            return new $websocketService(wsp.$$config, $http, $window);
+        wsp.$get = ['$http', '$window', '$rootScope', function ($http, $window, $rootScope) {
+            return new $websocketService(wsp.$$config, $http, $window, $rootScope);
         }];
     }
 
@@ -39,7 +39,7 @@
      * @description
      * HTML5 Websocket service for AngularJS
      */
-    function $websocketService (cfg, $http, $window) {
+    function $websocketService (cfg, $http, $window, $rootScope) {
         var wss = this;
 
         wss.$$websocketList = {};
@@ -73,7 +73,7 @@
             if (typeof ws === 'undefined') {
                 var wsCfg = angular.extend({}, wss.$$config, cfg);
 
-                ws = new $websocket(wsCfg, $http);
+                ws = new $websocket(wsCfg, $http, $rootScope);
                 wss.$$websocketList[wsCfg.url] = ws;
             }
 
@@ -88,7 +88,7 @@
      * @description
      * HTML5 Websocket wrapper class for AngularJS
      */
-    function $websocket (cfg, $http) {
+    function $websocket (cfg, $http, $rootScope) {
         var me = this;
 
         if (typeof cfg === 'undefined' || (typeof cfg === 'object' && typeof cfg.url === 'undefined')) throw new Error('An url must be specified for WebSocket');
@@ -121,6 +121,7 @@
                     if (typeof handlers[i] === 'function') handlers[i].apply(me, args);
                 }
             }
+            $rootScope.$digest();
         };
 
         me.$$init = function (cfg) {
