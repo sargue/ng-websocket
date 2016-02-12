@@ -73,7 +73,7 @@
             if (typeof ws === 'undefined') {
                 var wsCfg = angular.extend({}, wss.$$config, cfg);
 
-                ws = new $websocket(wsCfg, $http, $rootScope);
+                ws = new $websocket(wsCfg, $http, $rootScope, $window);
                 wss.$$websocketList[wsCfg.url] = ws;
             }
 
@@ -88,7 +88,7 @@
      * @description
      * HTML5 Websocket wrapper class for AngularJS
      */
-    function $websocket (cfg, $http, $rootScope) {
+    function $websocket (cfg, $http, $rootScope, $window) {
         var me = this;
 
         if (typeof cfg === 'undefined' || (typeof cfg === 'object' && typeof cfg.url === 'undefined')) throw new Error('An url must be specified for WebSocket');
@@ -178,7 +178,10 @@
                 }
 
                 me.$$fireEvent('$close');
+                $window.removeEventListener('beforeunload', me.$close);
             };
+            
+            $window.addEventListener('beforeunload', me.$close);
 
             return me;
         };
