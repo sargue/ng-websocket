@@ -31,6 +31,11 @@
             return new $websocketService(wsp.$$config, $http, $window, $rootScope);
         }];
     }
+    
+    function startsWith (string, searchString, position){
+        position = position || 0;
+        return string.substr(position, searchString.length) === searchString;
+    };
 
     /**
      * @ngdoc service
@@ -64,7 +69,7 @@
             }
             
             // If provided URL is relative try to come up with the absolute one
-            if (!cfg.url.startsWith('ws://') || !cfg.url.startsWith('wss://')) {
+            if (!startsWith(cfg.url, 'ws://') &&  !startsWith(cfg.url, 'wss://')) {
                 cfg.url = $window.location.origin.replace('http', 'ws') + $window.location.pathname + cfg.url;
             }
 
